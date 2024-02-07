@@ -4,4 +4,5 @@ This repository contains the codes for the psychophysical tests used in the stud
 Backstage codes and functions include auxillary codes that are used in the main experiments. To use it put them in your Matlab path.
 All codes use Matlab, psychtoolbox and psignifit. Codes were written and tested in Linux.
 
+For more information or questions you can contact me via email: m.gazanchian@umcg.nl
 
