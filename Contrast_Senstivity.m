@@ -81,7 +81,7 @@
     % suitable for a dichoptic setup with stereoscope
     stereoMode = 4;
     % Open a window using PsychImaging, with the specified background color, screen size, and stereo mode
-    [win, rect] = PsychImaging('OpenWindow', screenid, [R0 R0 R0], [], 32, 2, stereoMode, [], [], kPsychNeed32BPCFloat);
+    [win, winRect] = PsychImaging('OpenWindow', screenid, [R0 R0 R0], [], 32, 2, stereoMode, [], [], kPsychNeed32BPCFloat);
     % Enable alpha blending for drawing smoothed points
     Screen('BlendFunction', win, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
@@ -100,7 +100,7 @@
     end
 
     % Recording Movie of the experiment if required
-    %movie = Screen('CreateMovie', win, 'Contrast_Sensitivity.mov', rect(3)*2, rect(4), 40, ':CodecSettings=Videoquality=0.8 Profile=2');
+    %movie = Screen('CreateMovie', win, 'Contrast_Sensitivity.mov', winRect(3)*2, winRect(4), 40, ':CodecSettings=Videoquality=0.8 Profile=2');
 
     % Hide the mouse cursor and set the priority of the window to the maximum
     HideCursor;
@@ -141,15 +141,15 @@
     % 'Left eye' condition shows the stimulus monocularly to the left eye only
     % 'Right eye' condition shows the stimulus monocularly to the right eye only
     % 'Binocular' condition shows the stimulus binocularly
-    % 'Binasal' condition only showes the stimulus binocularly in the Binasal scotoma condition
-    % 'Altitudinal' condition only showes the stimulus binocularly in the Top down scotoma condition
+    % 'Binasal' condition only shows the stimulus binocularly in the Binasal scotoma condition
+    % 'Altitudinal' condition only shows the stimulus binocularly in the Top down scotoma condition
     % 'Checkered' condition shows the stimulus binocularly in the checkered scotoma condition
     condition_name = {'Left eye', 'Right eye', 'Binocular', 'Binasal', 'Altitudinal', 'Checkered'};
 
 %% 4. Monitor parameters 
     % Determine the width and height of the screen in pixels
-    w = rect(3);
-    h = rect(4);
+    w = winRect(3);
+    h = winRect(4);
     monitor_height = 0.29;      % BenQ screen Height (m) [Max ecc=11]
     viewD = 0.6;                % Viewing distance (m)
     den = h/monitor_height;     % Calculates the Pixel density of monitor
@@ -182,13 +182,13 @@
 
 %% 7. Test parameters 
     NTrials = 60;   % number of trials for each condition
-    % calculate the number of trials needed based on number of quests and NTrials,
+    % calculate the number of trials needed for all conditions based on number of quests and NTrials,
     % +2 is because we start updating quest after 3rd trial and first two trials are not important, 
     % they're just to get the participant ready
-    num_trials = NTrials*length(quests)+2;
+    NTrials_all = NTrials*length(quests)+2;
     % prepare a matrix inside g struct that saves the orientation of gabors for
     % each trial
-    g.stimOrder = Shuffle([zeros(1,num_trials/2) ones(1,num_trials/2)]);   % 0 = left, 1 = right
+    g.stimOrder = Shuffle([zeros(1,NTrials_all/2) ones(1,NTrials_all/2)]);   % 0 = left, 1 = right
     TPT = 2;                % the time for duration of each trial
     TIP = 0.5;              % Time in between trials
     scotoma_alpha = 1;      % the alpha level of the scotomas shown
@@ -196,7 +196,7 @@
     smoothing_res = 30;     % the resolution of smoothing, too much resolution causes slowing of stimulus presentation 
     Scotoma_R0 = R0;
     % creating trialcondition matrix
-    trialcondition = ones(1,num_trials);
+    trialcondition = ones(1,NTrials_all);
     % first two trials are shown binocularly
     trialcondition(1) = 3;
     trialcondition(2) = 3;
@@ -212,13 +212,13 @@
     % matrix that has the gabors spatial frequencies we want to show
     spatialfreq = 5/g.sizeDeg;
     % create the matrix that saves the spatial frequency of shown gabor for each trial
-    sf = zeros(1,num_trials);
+    sf = zeros(1,NTrials_all);
     % create the matrix that saves the contrast of shown gabor for each trial
-    ct = zeros(1,num_trials);
+    ct = zeros(1,NTrials_all);
     % a matrix to record if subject responsed correctly at each trial
-    correctResp = zeros(1,num_trials); 
+    correctResp = zeros(1,NTrials_all); 
     % a matrix to record the duration of each trial
-    t = zeros(1,num_trials); 
+    t = zeros(1,NTrials_all); 
 
 
 %% 8. Calibration phase
@@ -493,8 +493,8 @@
     % Loop through each quest
     for q = 1:length(quests)
         % Extract stimulus levels and responses for the current quest
-        stimulus_level = quests{q}.intensity(1:60);
-        stimulus_responses = quests{q}.response(1:60);
+        stimulus_level = quests{q}.intensity(1:NTrials);
+        stimulus_responses = quests{q}.response(1:NTrials);
     
         % Define plot options for the current quest
         plotOptions = struct;
