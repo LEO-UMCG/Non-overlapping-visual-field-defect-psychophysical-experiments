@@ -84,7 +84,7 @@
     % suitable for a dichoptic setup with stereoscope
     stereoMode = 4;
     % Open a window using PsychImaging, with the specified background color, screen size, and stereo mode
-    [win, rect] = PsychImaging('OpenWindow', screenid, [R0 R0 R0], [], 32, 2, stereoMode, [], [], kPsychNeed32BPCFloat);
+    [win, winRect] = PsychImaging('OpenWindow', screenid, [R0 R0 R0], [], 32, 2, stereoMode, [], [], kPsychNeed32BPCFloat);
     % Enable alpha blending for drawing smoothed points
     Screen('BlendFunction', win, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     % Determine the frames per second and inter-frame interval for the screen
@@ -98,7 +98,7 @@
     % Recording Movie of the experiment if required (rect(3)*2 because we
     % are using stereo mode 4 which is split screen if we don't multiply by
     % 2 then only half the screen will be recorded
-    %movie = Screen('CreateMovie', win, 'Shape_Recognition.mov', rect(3)*2, rect(4), 40, ':CodecSettings=Videoquality=0.8 Profile=2');
+    %movie = Screen('CreateMovie', win, 'Shape_Recognition.mov', winRect(3)*2, winRect(4), 40, ':CodecSettings=Videoquality=0.8 Profile=2');
 
     % Hide the mouse cursor and set the priority of the window to the maximum
     HideCursor;
@@ -140,15 +140,15 @@
     % 'Left eye' condition shows the stimulus monocularly to the left eye only
     % 'Right eye' condition shows the stimulus monocularly to the right eye only
     % 'Binocular' condition shows the stimulus binocularly
-    % 'Binasal' condition only showes the stimuli binocularly in the Binasal scotoma condition
-    % 'Altitudinal' condition only showes the stimuli binocularly in the Top down scotoma condition
+    % 'Binasal' condition only shows the stimuli binocularly in the Binasal scotoma condition
+    % 'Altitudinal' condition only shows the stimuli binocularly in the Top down scotoma condition
     % 'Checkered' condition shows the stimulus binocularly in the checkered scotoma condition
     condition_name = {'Left eye', 'Right eye', 'Binocular', 'Binasal', 'Altitudinal', 'Checkered'};
 
 %% 4. Monitor parameters 
     % Determine the width and height of the screen in pixels
-    w = rect(3);
-    h = rect(4);
+    w = winRect(3);
+    h = winRect(4);
     viewD = 0.6;    % Viewing distance (m)
     monitor_height = 0.29;  % BenQ screen Height (m) [Max ecc=11]
     den = h/monitor_height; % Calculates the Pixel density of monitor
@@ -193,12 +193,12 @@
     scotoma_alpha = 1;      % the alpha level of the scotomas shown
     smoothing_length = 0.15; % the percentage of scotoma that we want to smooth
     smoothing_res = 30;     % the resolution of smoothing, too much resolution causes slowing of stimulus presentation 
-    % calculate the number of trials needed based on number of quests and NTrials,
+    % calculate the number of trials needed for all conditions based on number of quests and NTrials,
     % +2 is because we start updating quest after 3rd trial and first two trials are not important, 
     % they're just to get the participant ready
-    num_trials = NTrials*length(quests)+2;
+    NTrials_all = NTrials*length(quests)+2;
     % creating trialcondition matrix
-    trialcondition = ones(1,num_trials);
+    trialcondition = ones(1,NTrials_all);
     % first two trials are shown binocularly
     trialcondition(1) = 3;
     trialcondition(2) = 3;
@@ -212,15 +212,15 @@
         trialcondition(j+2) = a(j);
     end
     % a matrix to record if subject responsed correctly at each trial
-    correctResp = zeros(1,num_trials); 
+    correctResp = zeros(1,NTrials_all); 
     % a matrix to record the duration of each trial
-    t = zeros(1,num_trials); 
+    t = zeros(1,NTrials_all); 
     % create the matrix that saves the percentage of coherent dots for each trial
-    angle_diff_mean = zeros(1,num_trials);
+    angle_diff_mean = zeros(1,NTrials_all);
     % create a matrix that saves shape of target shown for each trial
-    st_shape = zeros(1,num_trials);
+    st_shape = zeros(1,NTrials_all);
     % create a cell that saves the pressed keyboard button for each trial
-    keyCode = cell(1,num_trials);
+    keyCode = cell(1,NTrials_all);
 %% 8. Calibration phase 
     % Start with stimulus allignment - subject can press arrowkeys to adjust the stimulus positions
     fprintf("start of experiment\n") 
